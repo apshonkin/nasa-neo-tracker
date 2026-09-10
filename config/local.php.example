@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Локальная конфигурация: доступы к базе, ключи внешних сервисов, секрет для куки.
+ *
+ * Скопировать в config/local.php и подставить свои значения:
+ *   cp config/local.php.example config/local.php
+ *
+ * Файл накладывается поверх config/web.php и config/console.php через
+ * ArrayHelper::merge, поэтому здесь можно переопределить любой компонент.
+ * В git не попадает (см. .gitignore).
+ */
+
+return [
+    'components' => [
+        'db' => [
+            'dsn' => 'pgsql:host=127.0.0.1;port=5432;dbname=neo_tracker',
+            'username' => 'neo_tracker',
+            'password' => 'neo_tracker',
+        ],
+    ],
+    'params' => [
+        // Секрет для подписи куки. Сгенерировать:
+        //   php -r "echo bin2hex(random_bytes(16)), PHP_EOL;"
+        'cookieValidationKey' => 'вставить-случайную-строку',
+
+        // Ключ NASA API. DEMO_KEY имеет лимит 30 запросов в час на IP,
+        // персональный ключ (бесплатно, https://api.nasa.gov) — 1000 в час.
+        'nasa.apiKey' => 'DEMO_KEY',
+    ],
+];
