@@ -41,10 +41,11 @@ class Apod extends \yii\db\ActiveRecord
             [['media_type'], 'default', 'value' => self::MEDIA_IMAGE],
             [['date', 'title'], 'required'],
             [['date', 'created_at'], 'safe'],
-            // Проверяем формат до правила unique: иначе unique пойдёт искать
-            // мусор в базе и валидация упадёт ошибкой PostgreSQL.
+            // формат обязателен , т.к. на нем проверка висит
             [['date'], 'date', 'format' => 'php:Y-m-d'],
-            [['explanation', 'url', 'hdurl', 'thumbnail_url', 'copyright'], 'string'],
+            [['explanation', 'copyright'], 'string'],
+            // проверка что внутри ссылка, а не что то еще
+            [['url', 'hdurl', 'thumbnail_url'], 'url', 'validSchemes' => ['http', 'https']],
             [['title'], 'string', 'max' => 255],
             [['media_type'], 'string', 'max' => 32],
             [['date'], 'unique'],
@@ -80,7 +81,7 @@ class Apod extends \yii\db\ActiveRecord
         return $this->media_type === self::MEDIA_VIDEO;
     }
 
-    // Что показывать в списке: у видео вместо картинки превью, если оно пришло.
+    // Что показывать в списке: у видео вместо картинки превью, если оно пришло
     public function getPreviewUrl(): ?string
     {
         return $this->isVideo() ? $this->thumbnail_url : $this->url;

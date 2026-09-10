@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\LoginForm;
+use app\services\ApodService;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
@@ -19,6 +20,7 @@ class SiteController extends Controller
         $id,
         $module,
         private readonly Security $security,
+        private readonly ApodService $apodService,
         $config = [],
     ) {
         parent::__construct($id, $module, $config);
@@ -69,7 +71,7 @@ class SiteController extends Controller
      */
     public function actionIndex(): string
     {
-        return $this->render('index');
+        return $this->render('index', ['apod' => $this->apodService->getToday()]);
     }
 
     /**

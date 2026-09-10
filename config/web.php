@@ -17,14 +17,18 @@ $redis = require __DIR__ . '/redis.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
+    'name' => 'NEO Tracker',
+    'language' => 'ru-RU',
+    'timeZone' => 'Europe/Moscow',
     'bootstrap' => ['log'],
     'container' => [
         'singletons' => [
-            \yii\mail\MailerInterface::class => [
-                'class' => \yii\symfonymailer\Mailer::class,
-                // send all mails to a file by default.
-                'useFileTransport' => true,
-                'viewPath' => '@app/mail',
+            // клиент к NASA: ключ и таймауты в одном месте
+            \app\components\nasa\NasaClient::class => [
+                'class' => \app\components\nasa\NasaClient::class,
+                'baseUrl' => $params['nasa.baseUrl'],
+                'apiKey' => $params['nasa.apiKey'],
+                'timeout' => $params['nasa.timeout'],
             ],
         ],
     ],
@@ -51,7 +55,6 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => \yii\mail\MailerInterface::class,
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

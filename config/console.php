@@ -18,7 +18,20 @@ $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language' => 'ru-RU',
+    'timeZone' => 'Europe/Moscow',
     'controllerNamespace' => 'app\commands',
+    'container' => [
+        'singletons' => [
+            // клиент к NASA: ключ и таймауты в одном месте
+            \app\components\nasa\NasaClient::class => [
+                'class' => \app\components\nasa\NasaClient::class,
+                'baseUrl' => $params['nasa.baseUrl'],
+                'apiKey' => $params['nasa.apiKey'],
+                'timeout' => $params['nasa.timeout'],
+            ],
+        ],
+    ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',

@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 $items = [
     [
-        'label' => 'Home',
+        'label' => 'Главная страница',
         'url' => ['/site/index'],
     ],
     [
