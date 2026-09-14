@@ -6,7 +6,6 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
-use yii\base\Security;
 
 /**
  * LoginForm is the model behind the login form.
@@ -20,11 +19,6 @@ class LoginForm extends Model
     public bool $rememberMe = true;
     private User|null $_user = null;
     private bool $_userLoaded = false;
-    public function __construct(private readonly Security $security, $config = [])
-    {
-        parent::__construct($config);
-    }
-
     /**
      * @return array the validation rules.
      */
@@ -40,20 +34,29 @@ class LoginForm extends Model
         ];
     }
 
+    public function attributeLabels(): array
+    {
+        return [
+            'username' => 'Логин',
+            'password' => 'Пароль',
+            'rememberMe' => 'Запомнить меня',
+        ];
+    }
+
     /**
-     * Validates the password.
-     * This method serves as the inline validation for password.
+     * Инлайн-валидатор пароля из rules().
      *
-     * @param string $attribute the attribute currently being validated
-     * @param array $params the additional name-value pairs given in the rule
+     * @param string $attribute проверяемый атрибут
+     * @param array<string, mixed>|null $params дополнительные параметры правила
      */
     public function validatePassword(string $attribute, array|null $params): void
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
-            if (!$user || !$this->security->validatePassword($this->password, $user->passwordHash)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+            // одна формулировка на оба случая, чтобы не подсказывать, какие логины существуют
+            if ($user === null || !$user->validatePassword($this->password)) {
+                $this->addError($attribute, 'Неверный логин или пароль.');
             }
         }
     }

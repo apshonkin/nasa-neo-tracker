@@ -21,8 +21,19 @@ $config = [
     'language' => 'ru-RU',
     'timeZone' => 'Europe/Moscow',
     'controllerNamespace' => 'app\commands',
+    'controllerMap' => [
+        'migrate' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            // таблицы RBAC ставятся штатной миграцией самого Yii, а не нашей копией
+            'migrationPath' => ['@app/migrations', '@yii/rbac/migrations'],
+        ],
+    ],
     'container' => [
         'singletons' => [
+            // единственное место, где выбирается платёжный провайдер:
+            // подключить настоящий - значит поменять здесь класс
+            \app\components\payment\PaymentGatewayInterface::class
+                => \app\components\payment\FakePaymentGateway::class,
             // клиент к NASA: ключ и таймауты в одном месте
             \app\components\nasa\NasaClient::class => [
                 'class' => \app\components\nasa\NasaClient::class,
@@ -39,6 +50,11 @@ $config = [
     ],
     'components' => [
         'redis' => $redis,
+        'authManager' => [
+            'class' => \yii\rbac\DbManager::class,
+            // иерархию ролей незачем перечитывать на каждую проверку прав
+            'cache' => 'cache',
+        ],
         'cache' => [
             'class' => \yii\redis\Cache::class,
             'redis' => 'redis',

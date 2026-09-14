@@ -20,7 +20,4 @@ parameters:
         - YII_ENV_PROD
         - YII_ENV_TEST
 
-    ignoreErrors:
-        - '#Unsafe usage of new static\(\).#'
-
     tmpDir: %currentWorkingDirectory%/runtime

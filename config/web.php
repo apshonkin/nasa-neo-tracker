@@ -23,6 +23,9 @@ $config = [
     'bootstrap' => ['log'],
     'container' => [
         'singletons' => [
+            //платежный сервис меняем только тут
+            \app\components\payment\PaymentGatewayInterface::class
+                => \app\components\payment\FakePaymentGateway::class,
             // клиент к NASA: ключ и таймауты в одном месте
             \app\components\nasa\NasaClient::class => [
                 'class' => \app\components\nasa\NasaClient::class,
@@ -48,6 +51,11 @@ $config = [
             // Префикс отделяет ключи этого приложения от чужих на том же сервере.
             'keyPrefix' => 'neo:',
         ],
+        'authManager' => [
+            'class' => \yii\rbac\DbManager::class,
+            // иерархию ролей незачем перечитывать на каждую проверку прав
+            'cache' => 'cache',
+        ],
         'user' => [
             'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,
@@ -70,6 +78,9 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
+                'asteroids' => 'asteroid/index',
+                'support' => 'donation/index',
+                'support/stats' => 'donation/stats',
             ],
         ],
     ],

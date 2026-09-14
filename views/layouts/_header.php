@@ -10,16 +10,33 @@ use yii\helpers\Html;
 
 $items = [
     [
-        'label' => 'Главная страница',
+        'label' => 'Фотография дня',
         'url' => ['/site/index'],
     ],
     [
-        'label' => 'Login',
+        'label' => 'Астероиды',
+        'url' => ['/asteroid/index'],
+    ],
+    [
+        'label' => 'Поддержи проект',
+        'url' => ['/donation/index'],
+    ],
+    [
+        'label' => 'Статистика',
+        'url' => ['/donation/stats'],
+        'visible' => Yii::$app->user->can('viewDonationStats'),
+    ],
+];
+
+// второй список - справа: me-auto у первого отжимает его к правому краю
+$userItems = [
+    [
+        'label' => 'Вход',
         'url' => ['/site/login'],
         'visible' => Yii::$app->user->isGuest,
     ],
     [
-        'label' => 'Logout (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
+        'label' => 'Выйти (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
         'url' => ['/site/logout'],
         'linkOptions' => [
             'data-method' => 'post',
@@ -43,6 +60,13 @@ $items = [
             'options' => ['class' => 'navbar-nav me-auto'],
             'encodeLabels' => false,
             'items' => $items,
+        ],
+    ) ?>
+    <?= Nav::widget(
+        [
+            'options' => ['class' => 'navbar-nav'],
+            'encodeLabels' => false,
+            'items' => $userItems,
         ],
     ) ?>
     <?= Html::button(

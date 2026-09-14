@@ -6,10 +6,10 @@ namespace app\controllers;
 
 use Yii;
 use app\models\LoginForm;
+use app\models\SignupForm;
 use app\services\ApodService;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\base\Security;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -19,7 +19,6 @@ class SiteController extends Controller
     public function __construct(
         $id,
         $module,
-        private readonly Security $security,
         private readonly ApodService $apodService,
         $config = [],
     ) {
@@ -34,12 +33,17 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['logout', 'signup'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['signup'],
+                        'allow' => true,
+                        'roles' => ['?'],
                     ],
                 ],
             ],
@@ -85,7 +89,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $model = new LoginForm($this->security);
+        $model = new LoginForm();
 
         if ($model->load($this->request->post()) && $model->login()) {
             return $this->goBack();
@@ -93,7 +97,38 @@ class SiteController extends Controller
 
         $model->password = '';
 
-        return $this->render('login', ['model' => $model]);
+        return $this->render('auth', [
+            'loginModel' => $model,
+            'signupModel' => new SignupForm(),
+            'active' => 'login',
+        ]);
+    }
+
+    /**
+     * Регистрация. Роль user выдаётся внутри SignupForm.
+     */
+    public function actionSignup(): Response|string
+    {
+        $model = new SignupForm();
+
+        if ($model->load($this->request->post())) {
+            $user = $model->signup();
+
+            if ($user !== null) {
+                Yii::$app->user->login($user);
+                Yii::$app->session->setFlash('success', 'Аккаунт создан, вы вошли в систему.');
+
+                return $this->goHome();
+            }
+        }
+
+        $model->password = '';
+
+        return $this->render('auth', [
+            'loginModel' => new LoginForm(),
+            'signupModel' => $model,
+            'active' => 'signup',
+        ]);
     }
 
     /**

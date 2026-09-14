@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace app\commands;
 
+use app\components\nasa\NasaApiException;
 use app\services\ApodService;
 use app\services\ApodSyncStatus;
+use app\services\AsteroidService;
+use DateTimeImmutable;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\Console;
@@ -17,6 +20,7 @@ class NasaController extends Controller
         $id,
         $module,
         private readonly ApodService $apodService,
+        private readonly AsteroidService $asteroidService,
         $config = [],
     ) {
         parent::__construct($id, $module, $config);
@@ -42,6 +46,30 @@ class NasaController extends Controller
             ApodSyncStatus::NotPublishedYet => $this->ok("Снимок за {$date} ещё не опубликован."),
             ApodSyncStatus::Failed => $this->fail('не удалось забрать картинку дня, подробности в логе'),
         };
+    }
+
+    /**
+     * Сближения астероидов: забрать окно дат и сохранить в базу.
+     *
+     * Раз в ночь - NASA уточняет орбиты и открывает новые объекты с частотой дней,
+     * между двумя запусками чаще ничего не изменится:
+     *   30 4 * * * cd /path/to/project && php yii nasa/asteroids >> runtime/logs/cron.log 2>&1
+     *
+     * @param string|null $from начало интервала, Y-m-d, по умолчанию сегодня
+     * @param string|null $to конец интервала, по умолчанию +6 дней (лимит NeoWs - 7 дней)
+     */
+    public function actionAsteroids(?string $from = null, ?string $to = null): int
+    {
+        try {
+            $saved = $this->asteroidService->sync(
+                $from !== null ? new DateTimeImmutable($from) : null,
+                $to !== null ? new DateTimeImmutable($to) : null,
+            );
+        } catch (NasaApiException $e) {
+            return $this->fail($e->getMessage());
+        }
+
+        return $this->ok("Сохранено сближений: {$saved}", Console::FG_GREEN);
     }
 
     private function ok(string $message, ?int $color = null): int
