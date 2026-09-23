@@ -86,7 +86,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     // --- то, чего требует IdentityInterface ---
 
-    public static function findIdentity($id): static|null
+    public static function findIdentity($id): self|null
     {
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
@@ -114,7 +114,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     // --- вход и пароль ---
 
-    public static function findByUsername(string $username): static|null
+    public static function findByUsername(string $username): self|null
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
     }

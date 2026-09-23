@@ -75,12 +75,6 @@ a.desc:after {
     color: var(--bs-navbar-hover-color);
 }
 
-/* footer logo: light logo by default (light bg-body-tertiary), dark logo for dark theme */
-.footer-logo-dark { display: none; }
-
-[data-bs-theme="dark"] .footer-logo-light { display: none; }
-[data-bs-theme="dark"] .footer-logo-dark  { display: inline-block; }
-
 /* centered page layout */
 .site-login,
 .site-signup,

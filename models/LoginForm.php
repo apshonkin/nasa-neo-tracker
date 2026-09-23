@@ -20,7 +20,7 @@ class LoginForm extends Model
     private User|null $_user = null;
     private bool $_userLoaded = false;
     /**
-     * @return array the validation rules.
+     * @return array<int, array<int|string, mixed>> правила валидации
      */
     public function rules(): array
     {

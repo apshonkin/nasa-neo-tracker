@@ -19,8 +19,6 @@ use Yii;
  */
 class AsteroidApproach extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -64,5 +62,4 @@ class AsteroidApproach extends \yii\db\ActiveRecord
             'created_at' => 'Загружено',
         ];
     }
-
 }

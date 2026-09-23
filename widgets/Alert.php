@@ -29,7 +29,7 @@ use yii\bootstrap5\Alert as BootstrapAlert;
 class Alert extends \yii\bootstrap5\Widget
 {
     /**
-     * @var array the alert types configuration for the flash messages.
+     * @var array<string, string> the alert types configuration for the flash messages.
      * This array is setup as $key => $value, where:
      * - key: the name of the session flash variable
      * - value: the bootstrap alert type (i.e. danger, success, info, warning)
@@ -42,7 +42,7 @@ class Alert extends \yii\bootstrap5\Widget
         'warning' => 'alert-warning'
     ];
     /**
-     * @var array the options for rendering the close button tag.
+     * @var array<string, mixed> the options for rendering the close button tag.
      * Array will be passed to [[\yii\bootstrap\Alert::closeButton]].
      */
     public array $closeButton = [];

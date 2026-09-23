@@ -8,16 +8,18 @@ use app\models\AsteroidApproach;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 
-
 class AsteroidApproachSearch extends AsteroidApproach
 {
     // не колонка таблицы, а флажок в интерфейсе
     public bool|string|null $hazardousOnly = null;
 
     // добавляем руками , т.к нет в бд
+    /**
+     * @return list<string>
+     */
     public function attributes(): array
     {
-        return array_merge(parent::attributes(), ['hazardousOnly']);
+        return array_values(array_merge(parent::attributes(), ['hazardousOnly']));
     }
 
     public function rules(): array

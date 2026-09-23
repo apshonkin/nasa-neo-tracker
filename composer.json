@@ -1,25 +1,27 @@
 {
-    "name": "yiisoft/yii2-app-basic",
-    "description": "Yii 2 Basic Project Template",
+    "name": "apshonkin/nasa-neo-tracker",
+    "description": "Трекер сближений астероидов",
     "keywords": [
         "yii2",
-        "framework",
-        "basic",
-        "project template"
+        "nasa",
+        "neows",
+        "apod",
+        "asteroids",
+        "postgresql",
+        "redis"
     ],
-    "homepage": "https://www.yiiframework.com/",
+    "homepage": "https://github.com/apshonkin/nasa-neo-tracker",
     "type": "project",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "support": {
-        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
-        "forum": "https://www.yiiframework.com/forum/",
-        "wiki": "https://www.yiiframework.com/wiki/",
-        "irc": "ircs://irc.libera.chat:6697/yii",
-        "source": "https://github.com/yiisoft/yii2"
+        "issues": "https://github.com/apshonkin/nasa-neo-tracker/issues",
+        "source": "https://github.com/apshonkin/nasa-neo-tracker"
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
+        "ext-curl": "*",
+        "ext-pdo_pgsql": "*",
         "yiisoft/yii2": "~2.0.54",
         "yiisoft/yii2-bootstrap5": "~2.0.2",
         "yiisoft/yii2-symfonymailer": "~2.0.3",
@@ -29,7 +31,8 @@
         "phpstan/phpstan": "^2.1",
         "yiisoft/yii2-coding-standards": "^3.0",
         "yiisoft/yii2-debug": "~2.1.0",
-        "yiisoft/yii2-gii": "~2.2.0"
+        "yiisoft/yii2-gii": "~2.2.0",
+        "yii2-extensions/phpstan": "^0.4"
     },
     "config": {
         "allow-plugins": {
@@ -43,30 +46,7 @@
     "scripts": {
         "cs": "./vendor/bin/phpcs",
         "cs-fix": "./vendor/bin/phpcbf",
-        "post-install-cmd": [
-            "yii\\composer\\Installer::postInstall"
-        ],
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject",
-            "yii\\composer\\Installer::postInstall"
-        ],
         "static": "./vendor/bin/phpstan --memory-limit=-1"
-    },
-    "extra": {
-        "yii\\composer\\Installer::postCreateProject": {
-            "setPermission": [
-                {
-                    "runtime": "0777",
-                    "web/assets": "0777",
-                    "yii": "0755"
-                }
-            ]
-        },
-        "yii\\composer\\Installer::postInstall": {
-            "generateCookieValidationKey": [
-                "config/web.php"
-            ]
-        }
     },
     "repositories": [
         {

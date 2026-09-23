@@ -58,7 +58,9 @@ class DonationController extends Controller
     {
         $form = new DonationForm();
 
-        if ($form->load($this->request->post()) && $form->validate()) {
+        $post = $this->request->post();
+
+        if (is_array($post) && $form->load($post) && $form->validate()) {
             $payment = $this->service->start(
                 (int) Yii::$app->user->id,
                 (float) $form->amount,

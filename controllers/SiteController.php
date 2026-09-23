@@ -90,8 +90,9 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
+        $post = $this->request->post();
 
-        if ($model->load($this->request->post()) && $model->login()) {
+        if (is_array($post) && $model->load($post) && $model->login()) {
             return $this->goBack();
         }
 
@@ -110,8 +111,9 @@ class SiteController extends Controller
     public function actionSignup(): Response|string
     {
         $model = new SignupForm();
+        $post = $this->request->post();
 
-        if ($model->load($this->request->post())) {
+        if (is_array($post) && $model->load($post)) {
             $user = $model->signup();
 
             if ($user !== null) {

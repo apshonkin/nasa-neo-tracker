@@ -103,11 +103,11 @@ class DonationService
             ->limit($limit)
             ->all();
 
-        return array_map(static fn (array $row): array => [
+        return array_values(array_map(static fn (array $row): array => [
             'username' => (string) $row['username'],
             'total' => (float) $row['total'],
             'donations' => (int) $row['donations'],
-        ], $rows);
+        ], $rows));
     }
 
     /**
@@ -123,7 +123,12 @@ class DonationService
                 'supporters' => 'count(distinct user_id)',
                 'total' => 'coalesce(sum(amount), 0)',
             ])
-            ->one() ?: ['donations' => 0, 'supporters' => 0, 'total' => 0];
+            ->one();
+
+        // пустой период - это не ошибка, отдаём нули
+        if (!is_array($row) || $row === []) {
+            $row = ['donations' => 0, 'supporters' => 0, 'total' => 0];
+        }
 
         $donations = (int) $row['donations'];
         $total = (float) $row['total'];
@@ -141,13 +146,7 @@ class DonationService
     }
 
     /**
-     * Суммы по дням — сплошным рядом, без пропусков, с нарастающим итогом.
-     *
-     * Здесь чистый SQL, а не конструктор запросов, и по делу:
-     *  - generate_series достраивает дни, в которые донатов не было, иначе
-     *    в таблице дыры и видно только «удачные» дни;
-     *  - оконная функция даёт накопленную сумму одним проходом, без второго
-     *    запроса и без досчёта в PHP.
+     * Суммы по дням.
      *
      * @return list<array{day: string, donations: int, total: float, running_total: float}>
      */
@@ -174,12 +173,12 @@ class DonationService
             ':status' => Donation::STATUS_PAID,
         ])->queryAll();
 
-        return array_map(static fn (array $r): array => [
+        return array_values(array_map(static fn (array $r): array => [
             'day' => (string) $r['day'],
             'donations' => (int) $r['donations'],
             'total' => (float) $r['total'],
             'running_total' => (float) $r['running_total'],
-        ], $rows);
+        ], $rows));
     }
 
     /**
@@ -200,11 +199,11 @@ class DonationService
             ->orderBy(['total' => SORT_DESC])
             ->all();
 
-        return array_map(static fn (array $r): array => [
+        return array_values(array_map(static fn (array $r): array => [
             'username' => (string) $r['username'],
             'donations' => (int) $r['donations'],
             'total' => (float) $r['total'],
-        ], $rows);
+        ], $rows));
     }
 
     // общая часть всех отчётов: только оплаченные и только за период

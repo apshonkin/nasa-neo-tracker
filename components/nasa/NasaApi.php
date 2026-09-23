@@ -94,7 +94,7 @@ class NasaApi extends BaseObject
     /**
      * @param array<string, mixed> $object
      * @param array<string, mixed> $approach
-     * @return array<string, mixed>|null
+     * @return array{ref_id: string, name: string, diameter_m: float|null, velocity_kmh: float, approach_at: DateTimeImmutable, miss_lunar: float, is_hazardous: bool}|null
      */
     private function approachRow(array $object, array $approach): ?array
     {
