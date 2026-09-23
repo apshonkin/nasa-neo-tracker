@@ -1,0 +1,5 @@
+# Тесты без базы, сети и запущенного приложения.
+modules:
+    enabled:
+        - Asserts
+bootstrap: _bootstrap.php

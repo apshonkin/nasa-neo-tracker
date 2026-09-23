@@ -32,7 +32,9 @@
         "yiisoft/yii2-coding-standards": "^3.0",
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.2.0",
-        "yii2-extensions/phpstan": "^0.4"
+        "yii2-extensions/phpstan": "^0.4",
+        "codeception/codeception": "^5.3",
+        "codeception/module-asserts": "^3.0"
     },
     "config": {
         "allow-plugins": {
@@ -46,12 +48,18 @@
     "scripts": {
         "cs": "./vendor/bin/phpcs",
         "cs-fix": "./vendor/bin/phpcbf",
-        "static": "./vendor/bin/phpstan --memory-limit=-1"
+        "static": "./vendor/bin/phpstan --memory-limit=-1",
+        "test": "./vendor/bin/codecept run"
     },
     "repositories": [
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
         }
-    ]
+    ],
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    }
 }

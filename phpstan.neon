@@ -12,6 +12,7 @@ parameters:
         - models
         - services
         - widgets
+        - tests
 
     bootstrapFiles:
         - phpstan-bootstrap.php

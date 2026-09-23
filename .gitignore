@@ -37,3 +37,4 @@ tests/_support/_generated
 
 # local configuration: db credentials, api keys, cookie validation key
 /config/local.php
+tests/_output/*

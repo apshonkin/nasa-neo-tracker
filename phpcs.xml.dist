@@ -13,4 +13,5 @@
     <file>models</file>
     <file>services</file>
     <file>widgets</file>
+    <file>tests</file>
 </ruleset>

@@ -49,7 +49,7 @@ class NasaClient extends Component
             }
 
             if ($attempt < $this->maxAttempts) {
-                usleep(200_000 * $attempt);
+                $this->pause($attempt);
             }
         }
 
@@ -58,10 +58,16 @@ class NasaClient extends Component
         throw $lastError ?? new NasaApiException('Запрос к NASA не удался');
     }
 
+    protected function pause(int $attempt): void
+    {
+        usleep(200_000 * $attempt);
+    }
+
+    // единственное место, где ходим в сеть
     /**
-     * @return array{0: string, 1: int, 2: ?string}
+     * @return array{0: string, 1: int, 2: ?string} тело, код ответа, ошибка сети
      */
-    private function request(string $url): array
+    protected function request(string $url): array
     {
         $ch = curl_init($url);
         curl_setopt_array($ch, [
