@@ -10,6 +10,7 @@ use app\models\Donation;
 use app\models\User;
 use DateTimeImmutable;
 use Yii;
+use yii\caching\TagDependency;
 use yii\db\Query;
 use yii\helpers\Url;
 
@@ -88,6 +89,21 @@ class DonationService
      * @return list<array{username: string, total: float, donations: int}>
      */
     public function top(int $limit = 10): array
+    {
+        // считается по всем донатам сразу, а меняется только при новой оплате.
+        // поэтому кешируем и сбрасываем по тегу, час - на случай правки в базе руками
+        return Yii::$app->cache->getOrSet(
+            ['donation-top', $limit],
+            fn (): array => $this->calculateTop($limit),
+            3600,
+            new TagDependency(['tags' => Donation::CACHE_TAG]),
+        );
+    }
+
+    /**
+     * @return list<array{username: string, total: float, donations: int}>
+     */
+    private function calculateTop(int $limit): array
     {
         $rows = (new Query())
             ->select([

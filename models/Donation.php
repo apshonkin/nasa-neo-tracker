@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "donation".
@@ -23,6 +24,9 @@ class Donation extends \yii\db\ActiveRecord
     // pending - платёж создан, но денег ещё нет; paid - шлюз подтвердил оплату
     public const STATUS_PENDING = 'pending';
     public const STATUS_PAID = 'paid';
+
+    // тег для всего кеша, который считается по оплаченным донатам
+    public const CACHE_TAG = 'donations';
 
     /**
      * {@inheritdoc}
@@ -92,6 +96,13 @@ class Donation extends \yii\db\ActiveRecord
         $this->status = self::STATUS_PAID;
         $this->paid_at = new \yii\db\Expression('now()');
 
-        return $this->save(false);
+        if (!$this->save(false)) {
+            return false;
+        }
+
+        // донат стал оплаченным - всё, что посчитано по донатам, устарело
+        TagDependency::invalidate(Yii::$app->cache, self::CACHE_TAG);
+
+        return true;
     }
 }
