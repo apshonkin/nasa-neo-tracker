@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: Стиль и статический анализ
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v4
+
+      - name: Поставить PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, pdo_pgsql
+          coverage: none
+
+      - name: Поставить зависимости
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: phpcs
+        run: composer cs
+
+      - name: phpstan
+        run: composer static
+
+  tests:
+    name: Тесты
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v4
+
+      - name: Поставить PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, pdo_pgsql
+          coverage: none
+
+      - name: Поставить зависимости
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Codeception
+        run: composer test
