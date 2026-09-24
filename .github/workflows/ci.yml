@@ -8,11 +8,11 @@ on:
 jobs:
   quality:
     name: Стиль и статический анализ
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Забрать код
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Поставить PHP
         uses: shivammathur/setup-php@v2
@@ -32,11 +32,11 @@ jobs:
 
   tests:
     name: Тесты
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Забрать код
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Поставить PHP
         uses: shivammathur/setup-php@v2
