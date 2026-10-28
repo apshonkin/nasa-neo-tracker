@@ -93,11 +93,17 @@ class Donation extends \yii\db\ActiveRecord
     // вызывается только после того, как оплату подтвердил сам шлюз
     public function markPaid(): bool
     {
-        $this->status = self::STATUS_PAID;
-        $this->paid_at = new \yii\db\Expression('now()');
+        // Условный UPDATE вместо save(): два параллельных подтверждения оба видят pending,
+        // но перевести в paid сможет только первое, второе обновит 0 строк.
+        $updated = self::updateAll(
+            ['status' => self::STATUS_PAID, 'paid_at' => new \yii\db\Expression('now()')],
+            ['id' => $this->id, 'status' => self::STATUS_PENDING],
+        );
+        $this->refresh();
 
-        if (!$this->save(false)) {
-            return false;
+        if ($updated === 0) {
+            // нас опередили - для вызывающего это не ошибка, донат всё равно оплачен
+            return $this->isPaid();
         }
 
         // донат стал оплаченным - всё, что посчитано по донатам, устарело
