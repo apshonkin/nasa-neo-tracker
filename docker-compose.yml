@@ -1,0 +1,88 @@
+name: neo-tracker
+
+# Общие настройки php и cron: один образ, разные команды запуска.
+x-php: &php
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: dev
+    args:
+      UID: "${UID:-1000}"
+      GID: "${GID:-1000}"
+  image: neo-tracker/php:dev
+  env_file: [.env]
+  environment:
+    # внутри сети compose сервисы доступны по имени, а не по localhost
+    DB_HOST: postgres
+    DB_PORT: "5432"
+    REDIS_HOST: redis
+    REDIS_PORT: "6379"
+  volumes:
+    - ./:/app
+    # локальный конфиг для запуска без Docker тут не нужен - настройки из окружения
+    - ./docker/php/local.php:/app/config/local.php:ro
+  depends_on:
+    postgres: {condition: service_healthy}
+    redis: {condition: service_healthy}
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "${APP_PORT:-8899}:80"
+    volumes:
+      - ./web:/app/web:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [php]
+    restart: unless-stopped
+
+  php:
+    <<: *php
+    restart: unless-stopped
+
+  # Крон - отдельный контейнер, а не процесс внутри php: у каждого контейнера
+  # один главный процесс, свои логи и свой перезапуск.
+  cron:
+    <<: *php
+    volumes:
+      - ./:/app
+      - ./docker/php/local.php:/app/config/local.php:ro
+      - ./docker/php/crontab:/etc/crontabs/www-data:ro
+    command: ["crond", "-f", "-l", "8", "-L", "/dev/stdout"]
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: "${DB_NAME:-neo_tracker}"
+      POSTGRES_USER: "${DB_USER:-neo_tracker}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-neo_tracker}"
+    ports:
+      # порт на хосте не 5432, чтобы не мешать локальному PostgreSQL
+      - "${DB_HOST_PORT:-55433}:5432"
+    volumes:
+      # данные в именованном томе переживают пересоздание контейнера
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # чистый кеш: при перезапуске пересчитается, персистентность не нужна;
+    # при нехватке памяти вытесняются давно не используемые ключи
+    command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "${REDIS_HOST_PORT:-56380}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  pgdata:

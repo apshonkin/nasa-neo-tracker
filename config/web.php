@@ -1,14 +1,8 @@
 <?php
 
-// Локальные значения (доступы к БД, ключи, секрет куки) лежат вне git.
-if (!file_exists(__DIR__ . '/local.php')) {
-    throw new \yii\base\InvalidConfigException(
-        'Не найден config/local.php. Скопируйте пример и укажите свои доступы: '
-        . 'cp config/local.php.example config/local.php'
-    );
-}
-
-$local = require __DIR__ . '/local.php';
+// Локальные значения (доступы к БД, ключи, секрет куки) лежат вне git:
+// в Docker - в переменных окружения из .env, без Docker - в config/local.php.
+$local = file_exists(__DIR__ . '/local.php') ? require __DIR__ . '/local.php' : [];
 
 $params = \yii\helpers\ArrayHelper::merge(require __DIR__ . '/params.php', $local['params'] ?? []);
 $db = require __DIR__ . '/db.php';
@@ -76,8 +70,13 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            // По умолчанию правила кешируются в компоненте cache, то есть в Redis,
+            // и без Redis падал бы любой запрос ещё до контроллера, включая /health.
+            // Правил пять, собрать их на лету дешевле, чем сходить в кеш.
+            'cache' => false,
             'rules' => [
                 '' => 'site/index',
+                'health' => 'health/index',
                 'asteroids' => 'asteroid/index',
                 'support' => 'donation/index',
                 'support/stats' => 'donation/stats',

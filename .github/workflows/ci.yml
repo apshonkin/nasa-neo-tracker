@@ -50,3 +50,19 @@ jobs:
 
       - name: Codeception
         run: composer test
+
+  docker:
+    name: Прод-образ
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v7
+
+      - name: Собрать образ
+        run: docker build --target prod -f docker/php/Dockerfile -t neo-tracker/php:ci .
+
+      - name: Проверить, что образ запускается и не от root
+        run: |
+          docker run --rm neo-tracker/php:ci php -v
+          test "$(docker run --rm neo-tracker/php:ci id -un)" = www-data

@@ -1,0 +1,11 @@
+# Что не отправлять в контекст сборки: быстрее сборка и секреты не попадут в образ.
+.git
+.github
+.idea
+vendor
+runtime/*
+web/assets/*
+tests/_output
+config/local.php
+.env
+*.md

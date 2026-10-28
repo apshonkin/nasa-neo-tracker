@@ -2,10 +2,16 @@
 
 return [
     'class' => \yii\db\Connection::class,
-    // Доступы задаются в config/local.php (в git не попадает).
-    'dsn' => 'pgsql:host=127.0.0.1;port=5432;dbname=neo_tracker',
-    'username' => '',
-    'password' => '',
+    // Доступы приходят из окружения (в Docker - из .env) или из config/local.php.
+    // Значения по умолчанию - для запуска без Docker на локальном PostgreSQL.
+    'dsn' => sprintf(
+        'pgsql:host=%s;port=%s;dbname=%s',
+        getenv('DB_HOST') ?: '127.0.0.1',
+        getenv('DB_PORT') ?: '5432',
+        getenv('DB_NAME') ?: 'neo_tracker',
+    ),
+    'username' => getenv('DB_USER') ?: '',
+    'password' => getenv('DB_PASSWORD') ?: '',
     'charset' => 'utf8',
 
     // Схему таблиц незачем перечитывать на каждом запросе — держим её в Redis.

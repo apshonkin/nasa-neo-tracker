@@ -1,0 +1,6 @@
+# Расписание сервиса cron (busybox crond, задачи выполняются от www-data).
+# Картинку дня NASA выкладывает в разное время, поэтому проверяем раз в полчаса.
+0,30 * * * * cd /app && php yii nasa/apod >> /app/runtime/logs/cron.log 2>&1
+
+# Сближения меняются редко, раз в сутки ночью достаточно.
+30 4 * * * cd /app && php yii nasa/asteroids >> /app/runtime/logs/cron.log 2>&1
